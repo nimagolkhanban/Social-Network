@@ -2,7 +2,7 @@
 
 {% block content %}
  <h2> register user</h2>
-    <form action="" method="post" class="col-md-6 align-center">
+    <form action="" method="post" class="col-md-6 align-center" novalidate>
     {% csrf_token %}
         <hr style="margin-bottom: 25px">
     {{ form.as_p }}
