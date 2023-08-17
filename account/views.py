@@ -1,23 +1,23 @@
 from django.shortcuts import render,redirect
 from django.views import View
-# Create your views here.
 from .forms import UserRegistrationForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 from .forms import UserLoginForm
 from django.contrib.auth import authenticate,login,logout
-
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class RegisterView(View):
     form_class = UserRegistrationForm
-
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("home:home")
+        return super().dispatch(request,*args,**kwargs)
 
     def get(self, request):
         form = self.form_class()
         return render(request, "account/register.html" , {"form":form})
-
-
 
     def post(self, request):
         form = self.form_class(request.POST)
@@ -34,12 +34,14 @@ class RegisterView(View):
 
 class LoginView(View):
     form_class = UserLoginForm
-
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect("home:home")
+        return super().dispatch(request,*args,**kwargs)
 
     def get(self, request):
         form = self.form_class()
         return render(request, "account/login.html" , {"form":form})
-
 
     def post(self, request):
         form = self.form_class(request.POST)
@@ -55,7 +57,8 @@ class LoginView(View):
         return render(request, "account/login.html", {"form": form})
 
 
-class LogoutView(View):
+
+class LogoutView(LoginRequiredMixin,View):
     def get(self,request):
         logout(request)
         messages.success(request,"loges out seccussfully","success")
