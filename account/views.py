@@ -6,7 +6,7 @@ from django.contrib import messages
 from .forms import UserLoginForm
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from .authenticate import EmailBackend
 
 class RegisterView(View):
     form_class = UserRegistrationForm
@@ -40,7 +40,7 @@ class LoginView(View):
         return super().dispatch(request,*args,**kwargs)
 
     def get(self, request):
-        form = self.form_class()
+        form = self.form_class
         return render(request, "account/login.html" , {"form":form})
 
     def post(self, request):
@@ -63,4 +63,9 @@ class LogoutView(LoginRequiredMixin,View):
         logout(request)
         messages.success(request,"loges out seccussfully","success")
         return redirect("home:home")
+
+
+
+
+
 
