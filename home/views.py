@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views import View
 from .models import Post
-
+from .forms import PostUpdateForm
 
 class HomeView(View):
 
@@ -32,3 +32,25 @@ class PostDeleteView(LoginRequiredMixin, View):
         else:
             messages.error(request, "this in not your post", "danger")
         return redirect("home:home")
+
+
+class PostUpdateView(LoginRequiredMixin, View):
+
+    def dispatch(self, request, *args, **kwargs):
+        post = Post.objects.get(pk=kwargs["post_id"])
+        if post.user.id != request.user.id:
+            messages.error(request, "this post is not yours so you can't edit it", "danger")
+            return redirect("home:home")
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, post_id):
+        post = Post.objects.get(pk=post_id)
+        form = PostUpdateForm(instance=post)
+        return render(request, "home/update.html", {"form": form})
+
+
+    def post(self, request, post_id):
+
+        pass
+
+
