@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.utils.text import slugify
 from django.views import View
@@ -22,13 +22,13 @@ class HomeView(View):
 class PostDetailView(View):
 
     def get(self, request, post_id, post_slug):
-        post = Post.objects.get(pk=post_id, slug=post_slug)
+        post = get_object_or_404(Post, pk=post_id, slug=post_slug)
         return render(request, "home/detail.html", {"post": post})
 
 
 class PostDeleteView(LoginRequiredMixin, View):
     def get(self, request, post_id):
-        post = Post.objects.get(pk=post_id)
+        post = get_object_or_404(Post, pk=post_id)
         if post.user.id == request.user.id:
             post.delete()
             messages.success(request, "your post has been deleted", "success")
@@ -39,7 +39,7 @@ class PostDeleteView(LoginRequiredMixin, View):
 
 class PostUpdateView(LoginRequiredMixin, View):
     def setup(self, request, *args, **kwargs):
-        self.post_instance = Post.objects.get(pk=kwargs['post_id'])
+        self.post_instance = get_object_or_404(Post, pk=kwargs["post_id"])
         return super().setup(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
@@ -78,7 +78,7 @@ class PostCreateView(LoginRequiredMixin, View):
             new_post.user = request.user
             new_post.save()
             messages.success(request, "you create a post", "success")
-            return redirect('home:post_detail', new_post.id,new_post.slug)
+            return redirect('home:post_detail', new_post.id, new_post.slug)
         messages.error(request, "form is not valid ", "warning")
         return redirect('home:post_create')
 
