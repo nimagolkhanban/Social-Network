@@ -4,8 +4,10 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.utils.text import slugify
 from django.views import View
+from django.views.generic import CreateView
+
 from .models import Post
-from .forms import PostUpdateForm
+from .forms import PostCreateUpdateForm
 
 class HomeView(View):
 
@@ -49,12 +51,12 @@ class PostUpdateView(LoginRequiredMixin, View):
 
     def get(self, request, *args, **kwargs):
         post = self.post_instance
-        form = PostUpdateForm(instance=post)
+        form = PostCreateUpdateForm(instance=post)
         return render(request, "home/update.html", {"form": form})
 
     def post(self, request, *args, **kwargs):
         post = self.post_instance
-        form = PostUpdateForm(request.POST, instance=post)
+        form = PostCreateUpdateForm(request.POST, instance=post)
         if form.is_valid():
             new_post = form.save(commit=False)
             new_post.slug = slugify(form.cleaned_data["body"][:30])
@@ -62,5 +64,22 @@ class PostUpdateView(LoginRequiredMixin, View):
             messages.success(request, "your post has been changed", "success")
             return redirect('home:post_detail', post.id, post.slug)
 
+
+class PostCreateView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        form = PostCreateUpdateForm()
+        return render(request, "home/create.html", {"form":form})
+
+    def post(self, request, *args, **kwargs):
+        form = PostCreateUpdateForm(request.POST)
+        if form.is_valid():
+            new_post = form.save(commit=False)
+            new_post.slug = slugify(form.cleaned_data["body"][:30])
+            new_post.user = request.user
+            new_post.save()
+            messages.success(request, "you create a post", "success")
+            return redirect('home:post_detail', new_post.id,new_post.slug)
+        messages.error(request, "form is not valid ", "warning")
+        return redirect('home:post_create')
 
 

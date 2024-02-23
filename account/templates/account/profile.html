@@ -4,6 +4,10 @@
 {% endblock %}
 {% block content %}
 	<h2 class = text-center >{{ user.username }}</h2>
+    {% if user.id == request.user.id %}
+        <a href="{% url "home:post_create" %}" class="btn btn-primary">create</a>
+        <hr>
+    {% endif %} 
      <div class="card">
 	    {% for post in posts %}
             <a href="{{ post.get_absolute_url }}" class="card-body" >{{ post.body|truncatewords:8 }}</a>
