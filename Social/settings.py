@@ -130,3 +130,10 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'account.authenticate.EmailBackend',
 ]
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'ningoban@gmail.com'
+EMAIL_HOST_PASSWORD = 'eutdapxqrflhyrmi'
+EMAIL_USE_TLS = True
